@@ -5,6 +5,7 @@ import { render } from 'preact';
 import * as pdfAnchoring from '../anchoring/pdf';
 import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
+import { ListenerCollection } from '../util/listener-collection';
 
 import PDFMetadata from './pdf-metadata';
 
@@ -90,17 +91,16 @@ export default class PDF extends Delegator {
       );
     };
 
-    document.addEventListener(
+    this.listeners = new ListenerCollection();
+    this.listeners.add(
+      document,
       'selectionchange',
       this._updateAnnotationLayerVisibility
     );
   }
 
   destroy() {
-    document.removeEventListener(
-      'selectionchange',
-      this._updateAnnotationLayerVisibility
-    );
+    this.listeners.removeAll();
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
   }
