@@ -360,3 +360,5 @@ gulp.task(
   'test',
   gulp.series('build-css', done => runKarma(done))
 );
+
+process.on('SIGINT', () => process.exit());
