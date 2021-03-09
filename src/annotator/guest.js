@@ -1,6 +1,6 @@
 import scrollIntoView from 'scroll-into-view';
 
-import Delegator from './delegator';
+import GuestEmitter from './util/guest-emitter';
 import { Adder } from './adder';
 import CrossFrame from './plugin/cross-frame';
 import DocumentMeta from './plugin/document';
@@ -102,7 +102,7 @@ function resolveAnchor(anchor) {
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
  */
-export default class Guest extends Delegator {
+export default class Guest {
   /**
    * Initialize the Guest.
    *
@@ -113,10 +113,8 @@ export default class Guest extends Delegator {
    * @param {typeof htmlAnchoring} [anchoring] - Anchoring implementation
    */
   constructor(element, config = {}, anchoring = htmlAnchoring) {
-    super(element, config);
-
+    this.element = element;
     this.visibleHighlights = false;
-
     this.adderToolbar = document.createElement('hypothesis-adder');
     this.adderToolbar.style.display = 'none';
     this.element.appendChild(this.adderToolbar);
@@ -156,19 +154,20 @@ export default class Guest extends Delegator {
     // nb. The `anchoring` field defaults to HTML anchoring and in PDFs is replaced
     // by `PDFIntegration` below.
     this.anchoring = anchoring;
-    this.documentMeta = new DocumentMeta(this.element);
+    this.documentMeta = new DocumentMeta();
     if (config.documentType === 'pdf') {
-      this.pdfIntegration = new PDFIntegration(this.element, this);
+      this.pdfIntegration = new PDFIntegration(this);
     }
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null;
 
+    this.guestEmitter = new GuestEmitter();
     this.crossframe = new CrossFrame(this.element, {
       config,
-      on: (event, handler) => this.subscribe(event, handler),
-      emit: (event, ...args) => this.publish(event, args),
+      on: (event, handler) => this.guestEmitter.subscribe(event, handler),
+      emit: (event, ...args) => this.guestEmitter.publish(event, ...args),
     });
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
@@ -275,16 +274,16 @@ export default class Guest extends Delegator {
   }
 
   _setupInitialState(config) {
-    this.publish('panelReady');
+    this.guestEmitter.publish('panelReady');
     this.setVisibleHighlights(config.showHighlights === 'always');
   }
 
   _connectAnnotationSync() {
-    this.subscribe('annotationDeleted', annotation => {
+    this.guestEmitter.subscribe('annotationDeleted', annotation => {
       this.detach(annotation);
     });
 
-    this.subscribe('annotationsLoaded', annotations => {
+    this.guestEmitter.subscribe('annotationsLoaded', annotations => {
       annotations.map(annotation => this.anchor(annotation));
     });
   }
@@ -341,10 +340,8 @@ export default class Guest extends Delegator {
 
     removeAllHighlights(this.element);
 
-    this.documentMeta.destroy();
     this.pdfIntegration?.destroy();
-
-    super.destroy();
+    this.guestEmitter.destroy();
   }
 
   /**
@@ -525,7 +522,7 @@ export default class Guest extends Delegator {
 
   _updateAnchors(anchors) {
     this.anchors = anchors;
-    this.publish('anchorsChanged', [this.anchors]);
+    this.guestEmitter.publish('anchorsChanged', this.anchors);
   }
 
   /**
@@ -566,7 +563,7 @@ export default class Guest extends Delegator {
       $tag: '',
     };
 
-    this.publish('beforeAnnotationCreated', [annotation]);
+    this.guestEmitter.publish('beforeAnnotationCreated', annotation);
     this.anchor(annotation);
 
     if (!annotation.$highlight) {
@@ -626,7 +623,7 @@ export default class Guest extends Delegator {
     }
 
     this.selectedRanges = [range];
-    this.publish('hasSelectionChanged', [true]);
+    this.guestEmitter.publish('hasSelectionChanged', true);
 
     this.adderCtrl.annotationsForSelection = annotationsForSelection();
     this.adderCtrl.show(focusRect, isBackwards);
@@ -635,7 +632,7 @@ export default class Guest extends Delegator {
   _onClearSelection() {
     this.adderCtrl.hide();
     this.selectedRanges = [];
-    this.publish('hasSelectionChanged', [false]);
+    this.guestEmitter.publish('hasSelectionChanged', false);
   }
 
   /**
@@ -672,6 +669,6 @@ export default class Guest extends Delegator {
   setVisibleHighlights(shouldShowHighlights) {
     setHighlightsVisible(this.element, shouldShowHighlights);
     this.visibleHighlights = shouldShowHighlights;
-    this.publish('highlightsVisibleChanged', [shouldShowHighlights]);
+    this.guestEmitter.publish('highlightsVisibleChanged', shouldShowHighlights);
   }
 }

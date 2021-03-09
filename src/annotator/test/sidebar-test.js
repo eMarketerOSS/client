@@ -1,6 +1,5 @@
 import events from '../../shared/bridge-events';
 
-import Delegator from '../delegator';
 import Sidebar, { MIN_RESIZE } from '../sidebar';
 import { $imports } from '../sidebar';
 
@@ -67,11 +66,9 @@ describe('Sidebar', () => {
       call: sandbox.stub(),
     };
 
-    class FakeGuest extends Delegator {
+    class FakeGuest {
       constructor() {
-        const element = document.createElement('div');
-        super(element, {});
-
+        this.element = document.createElement('div');
         this.createAnnotation = sinon.stub();
         this.crossframe = fakeCrossFrame;
         this.setVisibleHighlights = sinon.stub();
@@ -137,7 +134,7 @@ describe('Sidebar', () => {
 
     it('becomes visible when the "panelReady" event fires', () => {
       const sidebar = createSidebar();
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.equal(sidebar.iframeContainer.style.display, '');
     });
   });
@@ -174,11 +171,9 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       const iframe = stubIframeWindow(sidebar);
 
-      sidebar.publish('beforeAnnotationCreated', [
-        {
-          $highlight: false,
-        },
-      ]);
+      sidebar.guestEmitter.publish('beforeAnnotationCreated', {
+        $highlight: false,
+      });
 
       assert.called(iframe.contentWindow.focus);
     });
@@ -187,11 +182,9 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       const iframe = stubIframeWindow(sidebar);
 
-      sidebar.publish('beforeAnnotationCreated', [
-        {
-          $highlight: true,
-        },
-      ]);
+      sidebar.guestEmitter.publish('beforeAnnotationCreated', {
+        $highlight: true,
+      });
 
       assert.notCalled(iframe.contentWindow.focus);
     });
@@ -235,7 +228,7 @@ describe('Sidebar', () => {
 
       // nb. This event is normally published by the Guest, but the sidebar
       // doesn't care about that.
-      sidebar.publish('hasSelectionChanged', [true]);
+      sidebar.guestEmitter.publish('hasSelectionChanged', true);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
     });
@@ -245,7 +238,7 @@ describe('Sidebar', () => {
 
       // nb. This event is normally published by the Guest, but the sidebar
       // doesn't care about that.
-      sidebar.publish('hasSelectionChanged', [false]);
+      sidebar.guestEmitter.publish('hasSelectionChanged', false);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
     });
@@ -282,12 +275,12 @@ describe('Sidebar', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
-        sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar.guestEmitter, 'publish');
         emitEvent('openNotebook', 'mygroup');
         assert.calledWith(
-          sidebar.publish,
+          sidebar.guestEmitter.publish,
           'openNotebook',
-          sinon.match(['mygroup'])
+          'mygroup'
         );
         assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
@@ -298,7 +291,7 @@ describe('Sidebar', () => {
       it('shows the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'show').callThrough();
-        sidebar.publish('closeNotebook');
+        sidebar.guestEmitter.publish('closeNotebook');
         assert.calledOnce(sidebar.show);
         assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
@@ -481,7 +474,7 @@ describe('Sidebar', () => {
         annotations: 'ann-id',
       });
       const open = sandbox.stub(sidebar, 'open');
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.calledOnce(open);
     });
 
@@ -490,7 +483,7 @@ describe('Sidebar', () => {
         group: 'group-id',
       });
       const open = sandbox.stub(sidebar, 'open');
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.calledOnce(open);
     });
 
@@ -499,7 +492,7 @@ describe('Sidebar', () => {
         query: 'tag:foo',
       });
       const open = sandbox.stub(sidebar, 'open');
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.calledOnce(open);
     });
 
@@ -508,14 +501,14 @@ describe('Sidebar', () => {
         openSidebar: true,
       });
       const open = sandbox.stub(sidebar, 'open');
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.calledOnce(open);
     });
 
     it('does not open the sidebar if not configured to.', () => {
       const sidebar = createSidebar();
       const open = sandbox.stub(sidebar, 'open');
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       assert.notCalled(open);
     });
   });
@@ -598,7 +591,7 @@ describe('Sidebar', () => {
   describe('window resize events', () => {
     it('hides the sidebar if window width is < MIN_RESIZE', () => {
       const sidebar = createSidebar({ openSidebar: true });
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
 
       window.innerWidth = MIN_RESIZE - 1;
       window.dispatchEvent(new Event('resize'));
@@ -608,7 +601,7 @@ describe('Sidebar', () => {
     it('invokes the "open" method when window is resized', () => {
       // Calling the 'open' methods adjust the marginLeft at different screen sizes
       const sidebar = createSidebar({ openSidebar: true });
-      sidebar.publish('panelReady');
+      sidebar.guestEmitter.publish('panelReady');
       sinon.stub(sidebar, 'open');
 
       // Make the window very small
@@ -696,23 +689,23 @@ describe('Sidebar', () => {
       });
 
       it('notifies when sidebar changes expanded state', () => {
-        sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar.guestEmitter, 'publish');
         sidebar.open();
         assert.calledOnce(layoutChangeHandlerSpy);
         assert.calledWith(
-          sidebar.publish,
+          sidebar.guestEmitter.publish,
           'sidebarLayoutChanged',
           sinon.match.any
         );
-        assert.calledWith(sidebar.publish, 'sidebarOpened');
-        assert.calledTwice(sidebar.publish);
+        assert.calledWith(sidebar.guestEmitter.publish, 'sidebarOpened');
+        assert.calledTwice(sidebar.guestEmitter.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
         });
 
         sidebar.close();
         assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledThrice(sidebar.publish);
+        assert.calledThrice(sidebar.guestEmitter.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
           width: fakeToolbar.getWidth(),
@@ -845,7 +838,7 @@ describe('Sidebar', () => {
     it('updates the bucket bar when an `anchorsChanged` event is received', () => {
       const sidebar = createSidebar();
 
-      fakeGuest.publish('anchorsChanged');
+      sidebar.guestEmitter.publish('anchorsChanged');
 
       assert.calledOnce(sidebar.bucketBar.update);
     });

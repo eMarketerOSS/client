@@ -6,7 +6,7 @@ import { createSidebarConfig } from './config/sidebar';
 import events from '../shared/bridge-events';
 import features from './features';
 
-import Delegator from './delegator';
+import GuestEmitter from './util/guest-emitter';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 import BucketBar from './bucket-bar';
@@ -57,7 +57,7 @@ function createSidebarIframe(config) {
  * The `Sidebar` class creates the sidebar application iframe and its container,
  * as well as the adjacent controls.
  */
-export default class Sidebar extends Delegator {
+export default class Sidebar {
   /**
    * Create the sidebar iframe, its container and adjacent controls.
    *
@@ -69,9 +69,9 @@ export default class Sidebar extends Delegator {
    * @param {Record<string, any>} [config]
    */
   constructor(element, guest, config = {}) {
-    super(element, config);
-
+    this.guestEmitter = new GuestEmitter();
     this.iframe = createSidebarIframe(config);
+    this.options = config;
 
     /** @type {BucketBar|null} */
     this.bucketBar = null;
@@ -94,7 +94,7 @@ export default class Sidebar extends Delegator {
           guest,
           config.BucketBar
         );
-        guest.subscribe('anchorsChanged', () => bucketBar.update());
+        this.guestEmitter.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
       }
 
@@ -113,14 +113,14 @@ export default class Sidebar extends Delegator {
     /** @type {RegisteredListener[]} */
     this.registeredListeners = [];
 
-    this.subscribe('panelReady', () => {
+    this.guestEmitter.subscribe('panelReady', () => {
       // Show the UI
       if (this.iframeContainer) {
         this.iframeContainer.style.display = '';
       }
     });
 
-    this.subscribe('beforeAnnotationCreated', annotation => {
+    this.guestEmitter.subscribe('beforeAnnotationCreated', annotation => {
       // When a new non-highlight annotation is created, focus
       // the sidebar so that the text editor can be focused as
       // soon as the annotation card appears
@@ -135,7 +135,7 @@ export default class Sidebar extends Delegator {
       config.query ||
       config.group
     ) {
-      this.subscribe('panelReady', () => this.open());
+      this.guestEmitter.subscribe('panelReady', () => this.open());
     }
 
     // Set up the toolbar on the left edge of the sidebar.
@@ -152,10 +152,10 @@ export default class Sidebar extends Delegator {
       this.toolbar.useMinimalControls = false;
     }
 
-    this.subscribe('highlightsVisibleChanged', visible => {
+    this.guestEmitter.subscribe('highlightsVisibleChanged', visible => {
       this.toolbar.highlightsVisible = visible;
     });
-    this.subscribe('hasSelectionChanged', hasSelection => {
+    this.guestEmitter.subscribe('hasSelectionChanged', hasSelection => {
       this.toolbar.newAnnotationType = hasSelection ? 'annotation' : 'note';
     });
 
@@ -207,7 +207,7 @@ export default class Sidebar extends Delegator {
     } else {
       this.iframe.remove();
     }
-    super.destroy();
+    this.guestEmitter.destroy();
   }
 
   /**
@@ -241,9 +241,9 @@ export default class Sidebar extends Delegator {
       /** @type {string} */ groupId
     ) => {
       this.hide();
-      this.publish('openNotebook', [groupId]);
+      this.guestEmitter.publish('openNotebook', groupId);
     });
-    this.subscribe('closeNotebook', () => {
+    this.guestEmitter.subscribe('closeNotebook', () => {
       this.show();
     });
 
@@ -362,7 +362,7 @@ export default class Sidebar extends Delegator {
     if (this.onLayoutChange) {
       this.onLayoutChange(layoutState);
     }
-    this.publish('sidebarLayoutChanged', [layoutState]);
+    this.guestEmitter.publish('sidebarLayoutChanged', layoutState);
   }
 
   /**
@@ -433,7 +433,7 @@ export default class Sidebar extends Delegator {
 
   open() {
     this.guest.crossframe.call('sidebarOpened');
-    this.publish('sidebarOpened');
+    this.guestEmitter.publish('sidebarOpened');
 
     if (this.iframeContainer) {
       const width = this.iframeContainer.getBoundingClientRect().width;

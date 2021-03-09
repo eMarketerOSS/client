@@ -1,4 +1,4 @@
-import Delegator from './delegator';
+import GuestEmitter from './util/guest-emitter';
 import { createSidebarConfig } from './config/sidebar';
 import { createShadowRoot } from './util/shadow-root';
 import { render } from 'preact';
@@ -31,9 +31,15 @@ function createNotebookFrame(config, groupId) {
   return notebookFrame;
 }
 
-export default class Notebook extends Delegator {
-  constructor(element, config) {
-    super(element, config);
+export default class Notebook {
+  /**
+   * @param {HTMLElement} element
+   * @param {Record<string, any>} config
+   */
+  constructor(element, config = {}) {
+    this.options = config;
+    this.element = element;
+    this.guestEmitter = new GuestEmitter();
     this.frame = null;
 
     /** @type {null|string} */
@@ -57,7 +63,7 @@ export default class Notebook extends Delegator {
      */
     this.container = null;
 
-    this.subscribe('openNotebook', groupId => {
+    this.guestEmitter.subscribe('openNotebook', groupId => {
       this._groupId = groupId;
       this.open();
     });
@@ -103,6 +109,7 @@ export default class Notebook extends Delegator {
 
   destroy() {
     this._outerContainer.remove();
+    this.guestEmitter.destroy();
   }
 
   _initContainer() {
@@ -121,7 +128,7 @@ export default class Notebook extends Delegator {
       // We stop the propagation of the event to prevent the sidebar to be opened.
       event.stopPropagation();
       this.close();
-      this.publish('closeNotebook');
+      this.guestEmitter.publish('closeNotebook');
     };
 
     render(

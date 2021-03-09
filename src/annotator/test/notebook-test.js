@@ -88,11 +88,11 @@ describe('Notebook', () => {
       notebook._groupId = 'mygroup';
 
       // The first opening will create a new iFrame
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook.guestEmitter.publish('openNotebook', 'myGroup');
       const removeSpy = sinon.spy(notebook.frame, 'remove');
       // Open it again — the group hasn't changed so the iframe won't be
       // replaced
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook.guestEmitter.publish('openNotebook', 'myGroup');
 
       assert.notCalled(removeSpy);
     });
@@ -102,11 +102,11 @@ describe('Notebook', () => {
       notebook._groupId = 'mygroup';
 
       // First open: creates an iframe
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook.guestEmitter.publish('openNotebook', 'myGroup');
       const removeSpy = sinon.spy(notebook.frame, 'remove');
 
       // Open again with another group
-      notebook.publish('openNotebook', ['anotherGroup']);
+      notebook.guestEmitter.publish('openNotebook', 'anotherGroup');
 
       // Open again, which will remove the first iframe and create a new one
       notebook.open();
@@ -132,7 +132,7 @@ describe('Notebook', () => {
     it('opens on `openNotebook`', () => {
       const notebook = createNotebook();
 
-      notebook.publish('openNotebook');
+      notebook.guestEmitter.publish('openNotebook');
 
       assert.equal(notebook.container.style.display, '');
     });

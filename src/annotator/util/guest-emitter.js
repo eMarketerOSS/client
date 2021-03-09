@@ -11,39 +11,16 @@ import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 //  https://github.com/openannotation/annotator/blob/master/LICENSE
 
 /**
- * `Delegator` is a base class for many objects in the annotator.
- *
- * It provides:
- *
- *  - An event bus, attached to the DOM element passed to the constructor.
- *    When an event is published, all `Delegator` instances that share the same
- *    root element will be able to receive the event.
- *  - Configuration storage (via `this.options`)
- *  - A mechanism to clean up event listeners and other resources added to
- *    the page by implementing a `destroy` method, which will be called when
- *    the annotator is removed from the page.
+ * Emitter is a pub/sub communication mechanism to send event among the
+ * different elements of the application.
  */
-export default class Delegator {
-  /**
-   * Construct the `Delegator` instance.
-   *
-   * @param {HTMLElement} element
-   * @param {Record<string, any>} [config]
-   */
-  constructor(element, config) {
-    this.options = { ...config };
-    this.element = element;
-
-    const el = /** @type {any} */ (element);
-
-    /** @type {EventEmitter} */
-    let eventBus = el._hypothesisEventBus;
-    if (!eventBus) {
-      eventBus = new EventEmitter();
-      el._hypothesisEventBus = eventBus;
+export default class GuestEmitter {
+  constructor() {
+    if (!GuestEmitter.emitter) {
+      GuestEmitter.emitter = new EventEmitter();
     }
-
-    this._eventBus = eventBus;
+    /** @type {EventEmitter} */
+    this._emitter = GuestEmitter.emitter;
 
     /** @type {[event: string, callback: Function][]} */
     this._subscriptions = [];
@@ -57,8 +34,9 @@ export default class Delegator {
    */
   destroy() {
     for (let [event, callback] of this._subscriptions) {
-      this._eventBus.off(event, callback);
+      this._emitter.off(event, callback);
     }
+    this._subscriptions = [];
   }
 
   /**
@@ -68,10 +46,10 @@ export default class Delegator {
    * be able to observe it.
    *
    * @param {string} event
-   * @param {any[]} [args]
+   * @param {any[]} args
    */
-  publish(event, args = []) {
-    this._eventBus.emit(event, ...args);
+  publish(event, ...args) {
+    this._emitter.emit(event, ...args);
   }
 
   /**
@@ -81,7 +59,7 @@ export default class Delegator {
    * @param {Function} callback
    */
   subscribe(event, callback) {
-    this._eventBus.on(event, callback);
+    this._emitter.on(event, callback);
     this._subscriptions.push([event, callback]);
   }
 
@@ -92,10 +70,12 @@ export default class Delegator {
    * @param {Function} callback
    */
   unsubscribe(event, callback) {
-    this._eventBus.off(event, callback);
+    this._emitter.off(event, callback);
     this._subscriptions = this._subscriptions.filter(
       ([subEvent, subCallback]) =>
         subEvent !== event || subCallback !== callback
     );
   }
 }
+
+GuestEmitter.emitter = undefined;

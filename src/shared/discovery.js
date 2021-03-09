@@ -33,7 +33,9 @@
 export default class Discovery {
   /**
    * @param {Window} target
-   * @param {Object} options
+   * @param {object} [options]
+   * @param {boolean} [options.server]
+   * @param {string} [options.origin]
    */
   constructor(target, options = {}) {
     /** The window to send and listen for messages with. */
@@ -41,7 +43,7 @@ export default class Discovery {
 
     /**
      * Set whether this frame acts as a server (fetches annotations from the
-     * API) or a client (contains annotatable content and displays highlights).
+     * API) or a client (contains annotable content and displays highlights).
      */
     this.server = false;
 

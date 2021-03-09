@@ -1,4 +1,3 @@
-import Delegator from '../delegator';
 import Guest from '../guest';
 import { $imports } from '../guest';
 
@@ -118,7 +117,6 @@ describe('Guest', () => {
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
-      './delegator': Delegator,
       'scroll-into-view': scrollIntoView,
     });
   });
@@ -139,7 +137,7 @@ describe('Guest', () => {
     it('publishes the "panelReady" event when a connection is established', () => {
       const handler = sandbox.stub();
       const guest = createGuest();
-      guest.subscribe('panelReady', handler);
+      guest.guestEmitter.subscribe('panelReady', handler);
       fakeCrossFrame.onConnect.yield();
       assert.called(handler);
     });
@@ -160,8 +158,8 @@ describe('Guest', () => {
         options.on('foo', fooHandler);
         options.on('bar', barHandler);
 
-        guest.publish('foo', ['1', '2']);
-        guest.publish('bar', ['1', '2']);
+        guest.guestEmitter.publish('foo', '1', '2');
+        guest.guestEmitter.publish('bar', '1', '2');
 
         assert.calledWith(fooHandler, '1', '2');
         assert.calledWith(barHandler, '1', '2');
@@ -199,8 +197,8 @@ describe('Guest', () => {
         const fooHandler = sandbox.stub();
         const barHandler = sandbox.stub();
 
-        guest.subscribe('foo', fooHandler);
-        guest.subscribe('bar', barHandler);
+        guest.guestEmitter.subscribe('foo', fooHandler);
+        guest.guestEmitter.subscribe('bar', barHandler);
 
         options.emit('foo', '1', '2');
         options.emit('bar', '1', '2');
@@ -553,7 +551,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('hasSelectionChanged', callback);
+      guest.guestEmitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithText();
 
@@ -563,7 +561,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `false` if selection is empty', () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('hasSelectionChanged', callback);
+      guest.guestEmitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithoutText();
 
@@ -577,7 +575,7 @@ describe('Guest', () => {
     it('creates a new annotation if "Annotate" is clicked', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest.guestEmitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onAnnotate();
 
@@ -587,7 +585,7 @@ describe('Guest', () => {
     it('creates a new highlight if "Highlight" is clicked', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest.guestEmitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onHighlight();
 
@@ -690,7 +688,7 @@ describe('Guest', () => {
     it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest.guestEmitter.subscribe('beforeAnnotationCreated', callback);
 
       const annotation = await guest.createAnnotation();
 
@@ -844,7 +842,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       const anchorsChanged = sinon.stub();
-      guest.subscribe('anchorsChanged', anchorsChanged);
+      guest.guestEmitter.subscribe('anchorsChanged', anchorsChanged);
 
       await guest.anchor(annotation);
 
@@ -928,7 +926,7 @@ describe('Guest', () => {
       const annotation = {};
       guest.anchors.push({ annotation });
       const anchorsChanged = sinon.stub();
-      guest.subscribe('anchorsChanged', anchorsChanged);
+      guest.guestEmitter.subscribe('anchorsChanged', anchorsChanged);
 
       guest.detach(annotation);
 

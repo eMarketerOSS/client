@@ -1,12 +1,12 @@
 import PdfSidebar from '../pdf-sidebar';
-import Delegator from '../delegator';
 
 import { mockBaseClass } from '../../test-util/mock-base';
+import GuestEmitter from '../util/guest-emitter';
 
-class FakeSidebar extends Delegator {
-  constructor(element, guest, config) {
-    super(element, config);
+class FakeSidebar {
+  constructor(element, guest) {
     this.guest = guest;
+    this.guestEmitter = new GuestEmitter();
   }
 
   _registerEvent(target, event, callback) {
@@ -130,9 +130,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: true, width: 428, height: 728 },
-        ]);
+        sidebar.guestEmitter.publish('sidebarLayoutChanged', {
+          expanded: true,
+          width: 428,
+          height: 728,
+        });
 
         assert.isTrue(sidebar.sideBySideActive);
         assert.calledOnce(fakePDFViewerUpdate);
@@ -152,9 +154,11 @@ describe('PdfSidebar', () => {
           sandbox.stub(window, 'innerWidth').value(1350);
           const sidebar = createPdfSidebar();
 
-          sidebar.publish('sidebarLayoutChanged', [
-            { expanded: true, width: 428, height: 728 },
-          ]);
+          sidebar.guestEmitter.publish('sidebarLayoutChanged', {
+            expanded: true,
+            width: 428,
+            height: 728,
+          });
 
           assert.isTrue(sidebar.sideBySideActive);
           assert.calledOnce(fakePDFViewerUpdate);
@@ -166,9 +170,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: false, width: 428, height: 728 },
-        ]);
+        sidebar.guestEmitter.publish('sidebarLayoutChanged', {
+          expanded: false,
+          width: 428,
+          height: 728,
+        });
 
         assert.isFalse(sidebar.sideBySideActive);
         assert.equal(fakePDFContainer.style.width, 'auto');
@@ -178,9 +184,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(800);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: true, width: 428, height: 728 },
-        ]);
+        sidebar.guestEmitter.publish('sidebarLayoutChanged', {
+          expanded: true,
+          width: 428,
+          height: 728,
+        });
 
         assert.isFalse(sidebar.sideBySideActive);
         assert.calledOnce(fakePDFViewerUpdate);

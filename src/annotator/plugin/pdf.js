@@ -3,7 +3,6 @@ import debounce from 'lodash.debounce';
 import { render } from 'preact';
 
 import * as pdfAnchoring from '../anchoring/pdf';
-import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 
 import PDFMetadata from './pdf-metadata';
@@ -42,13 +41,11 @@ function WarningBanner() {
   );
 }
 
-export default class PDF extends Delegator {
+export default class PDF {
   /**
    * @param {Annotator} annotator
    */
-  constructor(element, annotator) {
-    super(element);
-
+  constructor(annotator) {
     this.annotator = annotator;
     annotator.anchoring = pdfAnchoring;
 
