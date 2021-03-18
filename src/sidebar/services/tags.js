@@ -5,7 +5,6 @@
  * @property {number} updated - The timestamp when this tag was last used.
  */
 
-
 /**
  * Service for fetching tag suggestions from a tagProvider service
  * and storing data for future suggestions.
@@ -18,7 +17,6 @@
  */
 // @inject
 export default function tags(tagProvider, tagStore) {
-
   /**
    * Return a list of tag suggestions matching `query`.
    *
