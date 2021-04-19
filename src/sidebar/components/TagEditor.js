@@ -67,6 +67,23 @@ function TagEditor({
   };
 
   /**
+   * Helper function that adapts complex suggestions to the "h" expected string
+   *
+   * @param {Tag|string} suggestion
+   */
+  const suggestionText = suggestion => {
+    if (typeof suggestion === 'string') {
+      return suggestion;
+    }
+
+    if (typeof suggestion === 'object' && 'text' in suggestion) {
+      return suggestion.text;
+    }
+
+    return '';
+  };
+
+  /**
    * Helper function that returns a list of suggestions less any
    * results also found from the duplicates list.
    *
@@ -98,7 +115,7 @@ function TagEditor({
       const tags = await tagsService.filter({ text: pendingTag() });
 
       // TRANSFORM (Tag -> string): extract the text fields, removing any empty strings
-      const suggestions = tags.map(t => t.text).filter(s => s);
+      const suggestions = tags.map(suggestionText).filter(s => s);
 
       // Remove any repeated suggestions that are already tags
       // and set those to state.

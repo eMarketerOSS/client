@@ -50,6 +50,7 @@
  * @prop {string[]} rpcAllowedOrigins
  * @prop {SentryConfig} [sentry]
  * @prop {string} [websocketUrl]
+ * @prop {string} tagProviderUrl
  */
 
 /**

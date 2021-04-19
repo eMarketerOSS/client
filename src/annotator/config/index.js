@@ -49,5 +49,7 @@ export default function configFrom(window_) {
     externalContainerSelector: settings.hostPageSetting(
       'externalContainerSelector'
     ),
+
+    tagProviderUrl: settings.hostPageSetting('tagProviderUrl'),
   };
 }

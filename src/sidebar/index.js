@@ -118,6 +118,7 @@ import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { LocalTagsService } from './services/local-tags';
 import { PersistedDefaultsService } from './services/persisted-defaults';
+import { RemoteTagProviderService } from './services/remote-tag-provider';
 import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
 import { SessionService } from './services/session';
@@ -162,7 +163,7 @@ function startApp(config, appEl) {
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
-    .register('tagProvider', LocalTagsService)
+    .register('tagProvider', RemoteTagProviderService)
     .register('tagStore', LocalTagsService)
     .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
