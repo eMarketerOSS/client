@@ -27,7 +27,7 @@ export class RemoteTagProviderService {
     }
 
     if (!query || !('text' in query) || query.text.trim() === '') {
-      return Promise.resolve(null)
+      return Promise.resolve(null);
     }
 
     // query will match tag if:
