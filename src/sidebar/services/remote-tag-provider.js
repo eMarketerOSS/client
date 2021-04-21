@@ -25,6 +25,11 @@ export class RemoteTagProviderService {
     if (!this._tagProviderClient) {
       return Promise.resolve(null);
     }
+
+    if (!query || !('text' in query) || query.text.trim() === '') {
+      return Promise.resolve(null)
+    }
+
     // query will match tag if:
     // * tag starts with query (e.g. tag "banana" matches query "ban"), OR
     // * any word in the tag starts with query
@@ -33,7 +38,12 @@ export class RemoteTagProviderService {
     //   (e.g. tag "pink!banana" matches query "ban") (TODO: update index analyzer)
 
     // TODO: (does this timeout? ... fall back to local-storage? - caller concern?)
-    const resp = await this._tagProviderClient.search(query.text, limit, null);
+    const resp = await this._tagProviderClient.search(
+      query.text.toLowerCase(),
+      limit,
+      null
+    );
+
     return RemoteTagProviderService.unpackResponseToTagArray(resp);
   }
 
