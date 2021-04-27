@@ -1,5 +1,4 @@
-import tagsFactory from '../tags';
-import { Injector } from '../../../shared/injector';
+import { TagsService } from '../tags';
 
 let fakeTagProvider;
 let fakeTagStore;
@@ -12,18 +11,14 @@ describe('sidebar/services/tags', () => {
     sandbox = sinon.createSandbox();
 
     fakeTagProvider = {
-      filter: sinon.stub(),
+      filter: sinon.spy(),
     };
 
     fakeTagStore = {
-      store: sinon.stub(),
+      store: sinon.spy(),
     };
 
-    tags = new Injector()
-      .register('tagProvider', { value: fakeTagProvider })
-      .register('tagStore', { value: fakeTagStore })
-      .register('tags', tagsFactory)
-      .get('tags');
+    tags = new TagsService(fakeTagProvider, fakeTagStore);
   });
 
   afterEach(function () {

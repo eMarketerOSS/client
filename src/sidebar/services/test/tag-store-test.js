@@ -1,4 +1,4 @@
-import tagStoreFactory from '../local-tags';
+import { LocalTagsService } from '../local-tags';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
@@ -62,7 +62,7 @@ describe('sidebar/services/tag-store', () => {
     fakeLocalStorage.setObject(TAGS_MAP_KEY, savedTagsMap);
     fakeLocalStorage.setObject(TAGS_LIST_KEY, savedTagsList);
 
-    tags = tagStoreFactory(fakeLocalStorage);
+    tags = new LocalTagsService(fakeLocalStorage);
   });
 
   describe('#store', () => {

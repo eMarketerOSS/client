@@ -8,7 +8,7 @@
 /**
  * @typedef TagQuery
  * @property {string} text - The text entered in the tag editor
- * @property {object|null} context - Optional context object.
+ * @property [object] context - Optional context object.
  */
 
 /**
@@ -22,17 +22,26 @@
  * method to store entered tags.
  */
 // @inject
-export default function tags(tagProvider, tagStore) {
+export class TagsService {
+  /**
+   * @param tagProvider - TagProvider implementation
+   * @param tagStore - TagStore implementation
+   */
+  constructor(tagProvider, tagStore) {
+    this._provider = tagProvider;
+    this._store = tagStore;
+  }
+
   /**
    * Return a list of tag suggestions matching `query`.
    *
    * @async
    * @param {TagQuery} query
-   * @param {number|null} limit - Optional limit of the results.
+   * @param [limit] number - Optional limit of the results.
    * @return {Promise<Tag[]>} List of matching tags
    */
-  async function filter(query, limit = null) {
-    return tagProvider.filter(query, limit);
+  async filter(query, limit = null) {
+    return this._provider.filter(query, limit);
   }
 
   /**
@@ -43,12 +52,7 @@ export default function tags(tagProvider, tagStore) {
    * @param {Tag[]} tags - List of tags.
    * @return {Promise}
    */
-  async function store(tags) {
-    return tagStore.store(tags);
+  async store(tags) {
+    return this._store.store(tags);
   }
-
-  return {
-    filter,
-    store,
-  };
 }

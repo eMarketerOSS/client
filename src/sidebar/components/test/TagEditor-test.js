@@ -48,7 +48,7 @@ describe('TagEditor', function () {
     fakeOnTagInput = sinon.stub();
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeTagsService = {
-      filter: sinon.stub().resolves(['tag4', 'tag3']),
+      filter: sinon.stub().resolves([{ text: 'tag4' }, { text: 'tag3' }]),
     };
     fakeOnTagSuggestions = sinon.stub();
     $imports.$mock(mockImportedComponents());
@@ -114,7 +114,10 @@ describe('TagEditor', function () {
   });
 
   it('shows case-insensitive matches to suggested tags', async () => {
-    fakeTagsService.filter.resolves(['fine AArdvark', 'AAArgh']);
+    fakeTagsService.filter.resolves([
+      { text: 'fine AArdvark' },
+      { text: 'AAArgh' },
+    ]);
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'aa';
     await typeInputAndAwaitResponse(wrapper);
@@ -143,7 +146,10 @@ describe('TagEditor', function () {
     // "matching" as the component, so we should be able to handle cases where
     // there doesn't "seem" to be a match by just rendering the suggested tag
     // as-is.
-    fakeTagsService.filter.resolves(['fine AArdvark', 'AAArgh']);
+    fakeTagsService.filter.resolves([
+      { text: 'fine AArdvark' },
+      { text: 'AAArgh' },
+    ]);
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'bb';
     await typeInputAndAwaitResponse(wrapper);
@@ -380,7 +386,7 @@ describe('TagEditor', function () {
 
       it('should add the suggested tag when there is exactly one suggestion', async () => {
         const wrapper = createComponent();
-        fakeTagsService.filter.resolves(['tag3']);
+        fakeTagsService.filter.resolves([{ text: 'tag3' }]);
         wrapper.find('input').instance().value = 'tag';
         await typeInputAndAwaitResponse(wrapper);
         // suggestions: [tag3]

@@ -1,4 +1,4 @@
-import tagProviderFactory from '../local-tags';
+import { LocalTagsService } from '../local-tags';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
@@ -14,6 +14,11 @@ class FakeStorage {
 
   setObject(key, value) {
     this._storage[key] = value;
+  }
+
+  // Test seam
+  saved(...keys) {
+    return keys.map(key => this._storage[TAGS_MAP_KEY][key]);
   }
 }
 
@@ -62,23 +67,32 @@ describe('sidebar/services/tag-provider', () => {
     fakeLocalStorage.setObject(TAGS_MAP_KEY, savedTagsMap);
     fakeLocalStorage.setObject(TAGS_LIST_KEY, savedTagsList);
 
-    tags = tagProviderFactory(fakeLocalStorage);
+    tags = new LocalTagsService(fakeLocalStorage);
   });
 
   describe('#filter', () => {
     it('returns tags that start with the query string', async () => {
       let suggestions = await tags.filter({ text: 'b' });
-      assert.deepEqual(suggestions, ['bar', 'bar argon', 'banana']);
+      assert.deepEqual(
+        suggestions,
+        fakeLocalStorage.saved('bar', 'bar argon', 'banana')
+      );
     });
 
     it('returns tags that have any word starting with the query string', async () => {
       let suggestions = await tags.filter({ text: 'ar' });
-      assert.deepEqual(suggestions, ['bar argon', 'argon']);
+      assert.deepEqual(
+        suggestions,
+        fakeLocalStorage.saved('bar argon', 'argon')
+      );
     });
 
     it('is case insensitive', async () => {
       let suggestions = await tags.filter({ text: 'Ar' });
-      assert.deepEqual(suggestions, ['bar argon', 'argon']);
+      assert.deepEqual(
+        suggestions,
+        fakeLocalStorage.saved('bar argon', 'argon')
+      );
     });
 
     it('limits tags when provided a limit value', async () => {
@@ -86,9 +100,12 @@ describe('sidebar/services/tag-provider', () => {
       let two = await tags.filter({ text: 'b' }, 2);
       let tre = await tags.filter({ text: 'b' }, 3);
 
-      assert.deepEqual(one, ['bar']);
-      assert.deepEqual(two, ['bar', 'bar argon']);
-      assert.deepEqual(tre, ['bar', 'bar argon', 'banana']);
+      assert.deepEqual(one, fakeLocalStorage.saved('bar'));
+      assert.deepEqual(two, fakeLocalStorage.saved('bar', 'bar argon'));
+      assert.deepEqual(
+        tre,
+        fakeLocalStorage.saved('bar', 'bar argon', 'banana')
+      );
     });
   });
 });

@@ -74,8 +74,17 @@ function AnnotationEditor({
       return false;
     }
     const tagList = [...tags, newTag];
+
     // Update the tag locally for the suggested-tag list
-    tagsService.store(tagList);
+    const listOfTag = tagList.map(t => {
+      return {
+        text: t,
+        count: 1,
+        updated: Date.now(),
+      };
+    });
+    tagsService.store(listOfTag);
+
     onEditTags({ tags: tagList });
     return true;
   };

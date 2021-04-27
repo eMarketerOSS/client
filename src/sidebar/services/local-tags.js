@@ -1,6 +1,9 @@
 /** @typedef {import('./tags').Tag} Tag */
 /** @typedef {import('./tags').TagQuery} TagQuery */
 
+const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
+const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+
 /**
  * Service for fetching tag suggestions and storing data to generate them.
  *
@@ -9,9 +12,15 @@
  * on frequency of usage.
  */
 // @inject
-export default function localTags(localStorage) {
-  const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
-  const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+export class LocalTagsService {
+  /**
+   * Instantiated with a reference to the service responsible for storing tags
+   * locally.
+   * @param localStorage - Local storage service
+   */
+  constructor(localStorage) {
+    this._storage = localStorage;
+  }
 
   /**
    * Return a list of tag suggestions matching `query`.
@@ -21,8 +30,11 @@ export default function localTags(localStorage) {
    * @param {number|null} limit - Optional limit of the results.
    * @return {Promise<Tag[]>} List of matching tags
    */
-  async function filter(query, limit = null) {
-    const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
+  async filter(query, limit = null) {
+    const orderedTextTags = this._storage.getObject(TAGS_LIST_KEY) || [];
+    const tagDetails = this._storage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags = orderedTextTags.map(ott => tagDetails[ott]);
+
     let resultCount = 0;
     // query will match tag if:
     // * tag starts with query (e.g. tag "banana" matches query "ban"), OR
@@ -32,7 +44,7 @@ export default function localTags(localStorage) {
     //   (e.g. tag "pink!banana" matches query "ban")
     let regex = new RegExp('(\\W|\\b)' + query.text, 'i');
     let suggestions = savedTags.filter(tag => {
-      if (tag.match(regex)) {
+      if (tag.text.match(regex)) {
         if (limit === null || resultCount < limit) {
           // limit allows a subset of the results
           // See https://github.com/hypothesis/client/issues/1606
@@ -54,9 +66,9 @@ export default function localTags(localStorage) {
    * @param {Tag[]} tags - List of tags.
    * @return {Promise}
    */
-  async function store(tags) {
+  async store(tags) {
     // Update the stored (tag, frequency) map.
-    const savedTags = localStorage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags = this._storage.getObject(TAGS_MAP_KEY) || {};
     tags.forEach(tag => {
       if (savedTags[tag.text]) {
         savedTags[tag.text].count += 1;
@@ -69,7 +81,7 @@ export default function localTags(localStorage) {
         };
       }
     });
-    localStorage.setObject(TAGS_MAP_KEY, savedTags);
+    this._storage.setObject(TAGS_MAP_KEY, savedTags);
 
     // Sort tag suggestions by frequency.
     const tagsList = Object.keys(savedTags).sort((t1, t2) => {
@@ -78,13 +90,8 @@ export default function localTags(localStorage) {
       }
       return t1.localeCompare(t2);
     });
-    localStorage.setObject(TAGS_LIST_KEY, tagsList);
+    this._storage.setObject(TAGS_LIST_KEY, tagsList);
 
     return Promise.resolve();
   }
-
-  return {
-    filter,
-    store,
-  };
 }
