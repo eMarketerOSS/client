@@ -8,7 +8,7 @@
 /**
  * @typedef TagQuery
  * @property {string} text - The text entered in the tag editor
- * @property [object] context - Optional context object.
+ * @property {object} [context] - Optional context object.
  */
 
 /**
