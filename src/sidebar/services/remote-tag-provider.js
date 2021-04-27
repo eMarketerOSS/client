@@ -67,9 +67,9 @@ export class RemoteTagProviderService {
   static unpackConceptToTag(concept) {
     return {
       text: concept?.label,
-      scope: concept?.scheme,
       count: concept?.count,
       updated: concept?.updated,
+      scope: concept?.scheme,
     };
   }
 }
