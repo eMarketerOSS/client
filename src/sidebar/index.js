@@ -116,6 +116,7 @@ import { FrameSyncService } from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
+import { LocalTagsService } from './services/local-tags';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
@@ -161,6 +162,8 @@ function startApp(config, appEl) {
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
+    .register('tagProvider', LocalTagsService)
+    .register('tagStore', LocalTagsService)
     .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
     .register('store', store);
