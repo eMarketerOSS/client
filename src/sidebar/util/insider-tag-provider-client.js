@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 /**
  * @typedef TagProviderAPIResponseQuery
  * @property {string} text - The text query sent to the API
@@ -60,27 +58,28 @@ export default class InsiderTagProviderClient {
       this.tagSearchEndpoint.replace(/^\//, ''),
     ].join('/');
 
-    return this._get(
+    return this._request(
       urlWithEndpoint,
       Object.assign({ text }, limit && { limit }, schemes && { schemes })
     );
   }
 
   /**
-   * Make an `application/json` GET request.
+   * Make an `application/json` POST request to elasticsearch.
    *
    * @param {string} url
    * @param {object} data - Parameter dictionary
    */
-  async _get(url, data) {
-    const qs = queryString.stringify(data);
-    const requestUrl = [url, qs].join('?');
-
-    return fetch(requestUrl).then(response => {
+  async _request(url, data) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then(response => {
       if (!response.ok) {
         throw new Error('HTTP error, status = ' + response.status);
       }
-      return response.json();
+      return response.json().then(r => r.body);
     });
   }
 }
