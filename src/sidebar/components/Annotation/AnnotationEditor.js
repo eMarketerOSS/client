@@ -106,6 +106,10 @@ function AnnotationEditor({
     return false;
   };
 
+  const onTagSuggestions = suggestions => {
+    return suggestions;
+  };
+
   const onEditText = ({ text }) => {
     store.createDraft(draft.annotation, { ...draft, text });
   };
@@ -152,6 +156,7 @@ function AnnotationEditor({
         onAddTag={onAddTag}
         onRemoveTag={onRemoveTag}
         onTagInput={setPendingTag}
+        onTagSuggestions={onTagSuggestions}
         tagList={tags}
       />
       <div className="annotation__form-actions u-layout-row">
