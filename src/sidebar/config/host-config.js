@@ -58,6 +58,9 @@ export default function hostPageConfig(window) {
     'theme',
 
     'usernameUrl',
+
+    // Endpoint for remote tag provider.
+    'tagProviderUrl',
   ];
 
   // We need to coerce incoming values from the host config for 2 reasons:

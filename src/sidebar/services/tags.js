@@ -3,12 +3,13 @@
  * @property {string} text - The label of the tag
  * @property {number} count - The number of times this tag has been used.
  * @property {number} updated - The timestamp when this tag was last used.
+ * @property {string} [scope] - Optional scope descriptor.
  */
 
 /**
  * @typedef TagQuery
  * @property {string} text - The text entered in the tag editor
- * @property [object] context - Optional context object.
+ * @property {object} [context] - Optional context object.
  */
 
 /**
