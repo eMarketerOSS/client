@@ -14,8 +14,8 @@ import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef NotebookViewProps
- * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService - Injected service
- * @prop {import('../services/streamer').default} streamer - Injected service
+ * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
+ * @prop {import('../services/streamer').default} streamer
  */
 
 /**
@@ -50,9 +50,8 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   const lastPaginationPage = useRef(1);
   const [paginationPage, setPaginationPage] = useState(1);
 
-  const [hasTooManyAnnotationsError, setHasTooManyAnnotationsError] = useState(
-    false
-  );
+  const [hasTooManyAnnotationsError, setHasTooManyAnnotationsError] =
+    useState(false);
 
   // Load all annotations in the group, unless there are more than 5000
   // of them: this is a performance safety valve.
@@ -177,6 +176,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   );
 }
 
-NotebookView.injectedProps = ['loadAnnotationsService', 'streamer'];
-
-export default withServices(NotebookView);
+export default withServices(NotebookView, [
+  'loadAnnotationsService',
+  'streamer',
+]);

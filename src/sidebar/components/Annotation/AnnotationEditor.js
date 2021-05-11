@@ -166,11 +166,9 @@ function AnnotationEditor({
   );
 }
 
-AnnotationEditor.injectedProps = [
+export default withServices(AnnotationEditor, [
   'annotationsService',
   'settings',
   'tags',
   'toastMessenger',
-];
-
-export default withServices(AnnotationEditor);
+]);

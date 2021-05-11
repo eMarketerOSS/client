@@ -348,6 +348,4 @@ function TagEditor({
   );
 }
 
-TagEditor.injectedProps = ['tags'];
-
-export default withServices(TagEditor);
+export default withServices(TagEditor, ['tags']);

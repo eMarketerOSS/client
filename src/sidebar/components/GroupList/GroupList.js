@@ -46,9 +46,10 @@ function GroupList({ settings }) {
   const focusedGroup = store.focusedGroup();
   const userid = store.profile().userid;
 
-  const myGroupsSorted = useMemo(() => groupsByOrganization(myGroups), [
-    myGroups,
-  ]);
+  const myGroupsSorted = useMemo(
+    () => groupsByOrganization(myGroups),
+    [myGroups]
+  );
 
   const featuredGroupsSorted = useMemo(
     () => groupsByOrganization(featuredGroups),
@@ -148,6 +149,4 @@ function GroupList({ settings }) {
   );
 }
 
-GroupList.injectedProps = ['settings'];
-
-export default withServices(GroupList);
+export default withServices(GroupList, ['settings']);

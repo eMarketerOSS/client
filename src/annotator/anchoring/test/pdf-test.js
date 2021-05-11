@@ -139,8 +139,8 @@ describe('annotator/anchoring/pdf', function () {
       const quote = 'NODE B';
 
       // this selects NODE A text node
-      const textNodeSelected = container.querySelector('.textLayer div')
-        .firstChild;
+      const textNodeSelected =
+        container.querySelector('.textLayer div').firstChild;
       const staticRange = findText(container, quote);
 
       const range = {
@@ -298,7 +298,7 @@ describe('annotator/anchoring/pdf', function () {
           return pdfAnchoring.anchor(container, selectors);
         })
         .then(function (anchoredRange) {
-          assert.equal(anchoredRange.toString(), 'Loading annotations…');
+          assert.equal(anchoredRange.toString(), 'Loading annotations...');
         });
     });
 

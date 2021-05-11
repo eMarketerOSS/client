@@ -12,9 +12,9 @@ import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = /** @type {import('../types/config').SidebarConfig} */ (parseJsonConfig(
-  document
-));
+const appConfig = /** @type {import('../types/config').SidebarConfig} */ (
+  parseJsonConfig(document)
+);
 
 if (appConfig.sentry) {
   // Initialize Sentry. This is required at the top of this file
@@ -46,7 +46,7 @@ function setupApi(api, streamer) {
  * route to match the current URL.
  *
  * @param {Object} groups
- * @param {Object} session
+ * @param {import('./services/session').SessionService} session
  * @param {import('./services/router').RouterService} router
  */
 // @inject
@@ -114,13 +114,13 @@ import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
 import { FrameSyncService } from './services/frame-sync';
 import groupsService from './services/groups';
-import loadAnnotationsService from './services/load-annotations';
+import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { LocalTagsService } from './services/local-tags';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
-import sessionService from './services/session';
+import { SessionService } from './services/session';
 import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
 import { TagsService } from './services/tags';
@@ -153,12 +153,12 @@ function startApp(config, appEl) {
     .register('features', FeaturesService)
     .register('frameSync', FrameSyncService)
     .register('groups', groupsService)
-    .register('loadAnnotationsService', loadAnnotationsService)
+    .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)
     .register('serviceURL', ServiceURLService)
-    .register('session', sessionService)
+    .register('session', SessionService)
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
@@ -192,9 +192,9 @@ function startApp(config, appEl) {
   );
 }
 
-const appEl = /** @type {HTMLElement} */ (document.querySelector(
-  'hypothesis-app'
-));
+const appEl = /** @type {HTMLElement} */ (
+  document.querySelector('hypothesis-app')
+);
 
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
