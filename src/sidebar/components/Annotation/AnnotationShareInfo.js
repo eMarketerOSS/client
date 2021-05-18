@@ -27,6 +27,8 @@ function AnnotationShareInfo({ annotation }) {
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;
 
+  // TODO: Replicate usernameUrl for groups (after usernameUrl is working)
+
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
   return (
