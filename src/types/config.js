@@ -51,6 +51,9 @@
  * @prop {SentryConfig} [sentry]
  * @prop {string} [websocketUrl]
  * @prop {string} tagProviderUrl
+ * @prop {string} usernameUrl
+ * @prop {string} groupnameUrl
+ * @prop {string} tagnameUrl
  */
 
 /**

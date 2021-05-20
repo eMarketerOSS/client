@@ -1,4 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
+import { withServices } from '../../service-context';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isPrivate } from '../../helpers/permissions';
@@ -6,11 +7,13 @@ import { isPrivate } from '../../helpers/permissions';
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
  * @typedef {import('../../../types/api').Group} Group
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  */
 
 /**
  * @typedef AnnotationShareInfoProps
  * @prop {Annotation} annotation
+ * @prop {MergedConfig} settings - Injected
  */
 
 /**
@@ -19,13 +22,26 @@ import { isPrivate } from '../../helpers/permissions';
  *
  * @param {AnnotationShareInfoProps} props
  */
-function AnnotationShareInfo({ annotation }) {
+function AnnotationShareInfo({ annotation, settings }) {
+  const groupLink = group => {
+    if (group && group?.links.html) {
+      if (!settings.groupnameUrl) {
+        return group.links.html;
+      } else {
+        return `${settings.groupnameUrl}${encodeURIComponent(group.name)}`;
+      }
+    }
+
+    return undefined;
+  };
+
   const store = useStoreProxy();
   const group = store.getGroup(annotation.group);
 
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
-  const linkToGroup = group?.links.html;
+  // If there is a settings override `groupnameUrl`, append groupname to this link.
+  const linkToGroup = groupLink(group);
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
@@ -34,7 +50,7 @@ function AnnotationShareInfo({ annotation }) {
       {group && linkToGroup && (
         <a
           className="u-layout-row--align-baseline u-color-text--muted"
-          href={group.links.html}
+          href={linkToGroup}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -55,4 +71,4 @@ function AnnotationShareInfo({ annotation }) {
   );
 }
 
-export default AnnotationShareInfo;
+export default withServices(AnnotationShareInfo, ['settings']);

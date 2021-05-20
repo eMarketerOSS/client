@@ -105,10 +105,10 @@ describe('AnnotationHeader', () => {
   });
 
   describe('annotation author (user) information', () => {
-    it('should link to author activity if first-party', () => {
+    it('should link to author activity if first-party and no settings URL', () => {
       fakeAccountId.isThirdPartyUser.returns(false);
 
-      const wrapper = createAnnotationHeader();
+      const wrapper = createAnnotationHeader({ settings: {} });
 
       assert.equal(
         wrapper.find('AnnotationUser').props().authorLink,
@@ -116,7 +116,7 @@ describe('AnnotationHeader', () => {
       );
     });
 
-    it('should link to author activity if third-party and has settings URL', () => {
+    it('should link to author activity if third-party', () => {
       fakeAccountId.isThirdPartyUser.returns(true);
       const fakeAnnotation = fixtures.defaultAnnotation();
 
@@ -124,7 +124,18 @@ describe('AnnotationHeader', () => {
 
       assert.equal(
         wrapper.find('AnnotationUser').props().authorLink,
-        `http://foo.bar/${fakeAnnotation.user}`
+        `http://foo.bar/${encodeURIComponent(fakeAnnotation.user)}`
+      );
+    });
+
+    it('should link to author activity if has settings URL', () => {
+      const fakeAnnotation = fixtures.defaultAnnotation();
+
+      const wrapper = createAnnotationHeader({ annotation: fakeAnnotation });
+
+      assert.equal(
+        wrapper.find('AnnotationUser').props().authorLink,
+        `http://foo.bar/${encodeURIComponent(fakeAnnotation.user)}`
       );
     });
 

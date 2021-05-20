@@ -2,20 +2,24 @@ import { useMemo } from 'preact/hooks';
 import { useStoreProxy } from '../store/use-store';
 
 import { isThirdPartyUser } from '../helpers/account-id';
+import { withServices } from '../service-context';
 
-/** @typedef {import('../../types/api').Annotation} Annotation */
+/** @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
 
 /**
  * @typedef TagListProps
  * @prop {Annotation} annotation - Annotation that owns the tags.
  * @prop {string[]} tags - List of tags as strings.
+ * @prop {MergedConfig} settings - Injected
  */
 
 /**
  * Component to render an annotation's tags.
  * @param {TagListProps} props
  */
-function TagList({ annotation, tags }) {
+function TagList({ annotation, tags, settings }) {
   const store = useStoreProxy();
   const defaultAuthority = store.defaultAuthority();
   const renderLink = useMemo(
@@ -30,7 +34,11 @@ function TagList({ annotation, tags }) {
    * @return {string}
    */
   const createTagSearchURL = tag => {
-    return store.getLink('search.tag', { tag: tag });
+    if (!settings.tagnameUrl) {
+      return store.getLink('search.tag', { tag: tag });
+    } else {
+      return `${settings.tagnameUrl}${encodeURIComponent(tag)}`;
+    }
   };
 
   return (
@@ -61,4 +69,4 @@ function TagList({ annotation, tags }) {
   );
 }
 
-export default TagList;
+export default withServices(TagList, ['settings']);
