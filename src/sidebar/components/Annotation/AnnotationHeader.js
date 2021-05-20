@@ -58,9 +58,9 @@ function AnnotationHeader({
     displayNamesEnabled
   );
 
-  // TODO:  Get this from usernameUrl (verify that !isThirdParty)
+
   const authorLink = (() => {
-    if (!isThirdParty) {
+    if (!isThirdParty && !settings.usernameUrl) {
       return store.getLink('user', { user: annotation.user });
     } else {
       return (

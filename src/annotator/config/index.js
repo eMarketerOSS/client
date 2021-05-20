@@ -29,6 +29,8 @@ export default function configFrom(window_) {
     focus: settings.hostPageSetting('focus'),
     theme: settings.hostPageSetting('theme'),
     usernameUrl: settings.hostPageSetting('usernameUrl'),
+    groupnameUrl: settings.hostPageSetting('groupnameUrl'),
+    tagnameUrl: settings.hostPageSetting('tagnameUrl'),
     onLayoutChange: settings.hostPageSetting('onLayoutChange'),
     openSidebar: settings.hostPageSetting('openSidebar', {
       allowInBrowserExt: true,
@@ -50,6 +52,6 @@ export default function configFrom(window_) {
       'externalContainerSelector'
     ),
 
-    tagProviderUrl: settings.hostPageSetting('tagProviderUrl'),
+    tagProviderUrl: settings.hostPageSetting('tagProviderUrl')
   };
 }
