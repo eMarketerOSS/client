@@ -58,14 +58,15 @@ function AnnotationHeader({
     displayNamesEnabled
   );
 
-
   const authorLink = (() => {
     if (!isThirdParty && !settings.usernameUrl) {
       return store.getLink('user', { user: annotation.user });
     } else {
       return (
         (settings.usernameUrl &&
-          `${settings.usernameUrl}${username(annotation.user)}`) ??
+          `${settings.usernameUrl}${encodeURIComponent(
+            username(annotation.user)
+          )}`) ??
         undefined
       );
     }

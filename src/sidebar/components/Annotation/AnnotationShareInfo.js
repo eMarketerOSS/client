@@ -16,37 +16,32 @@ import { isPrivate } from '../../helpers/permissions';
  * @prop {MergedConfig} settings - Injected
  */
 
-const groupLink = (group, settings) => {
-  if (group && group?.links.html) {
-    if (!settings.groupnameUrl) {
-      return group.links.html;
-    }
-    else {
-      return `${settings.groupnameUrl}${group.name}`
-    }
-  }
-
-  return undefined;
-};
-
-
 /**
  * Render information about what group an annotation is in and
  * whether it is private to the current user (only me)
  *
  * @param {AnnotationShareInfoProps} props
  */
-function AnnotationShareInfo({
- annotation,
- settings
-}) {
+function AnnotationShareInfo({ annotation, settings }) {
+  const groupLink = group => {
+    if (group && group?.links.html) {
+      if (!settings.groupnameUrl) {
+        return group.links.html;
+      } else {
+        return `${settings.groupnameUrl}${encodeURIComponent(group.name)}`;
+      }
+    }
+
+    return undefined;
+  };
+
   const store = useStoreProxy();
   const group = store.getGroup(annotation.group);
 
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   // If there is a settings override `groupnameUrl`, append groupname to this link.
-  const linkToGroup = groupLink(group, settings);
+  const linkToGroup = groupLink(group);
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
 

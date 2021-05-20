@@ -9,10 +9,18 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('TagList', () => {
   let fakeIsThirdPartyUser;
   let fakeStore;
+  let fakeSettings;
   const fakeTags = ['tag1', 'tag2'];
 
   function createComponent(props) {
-    return mount(<TagList annotation={{}} tags={fakeTags} {...props} />);
+    return mount(
+      <TagList
+        annotation={{}}
+        tags={fakeTags}
+        settings={fakeSettings}
+        {...props}
+      />
+    );
   }
 
   beforeEach(() => {
@@ -22,6 +30,8 @@ describe('TagList', () => {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       getLink: sinon.stub().returns('http://serviceurl.com'),
     };
+
+    fakeSettings = {};
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({

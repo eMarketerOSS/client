@@ -12,11 +12,13 @@ describe('AnnotationShareInfo', () => {
   let fakeStore;
   let fakeGetGroup;
   let fakeIsPrivate;
+  let fakeSettings;
 
   const createAnnotationShareInfo = props => {
     return mount(
       <AnnotationShareInfo
         annotation={fixtures.defaultAnnotation()}
+        settings={fakeSettings}
         {...props}
       />
     );
@@ -33,6 +35,7 @@ describe('AnnotationShareInfo', () => {
     fakeGetGroup = sinon.stub().returns(fakeGroup);
     fakeStore = { getGroup: fakeGetGroup };
     fakeIsPrivate = sinon.stub().returns(false);
+    fakeSettings = { groupnameUrl: 'http://foo.bar/' };
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -46,8 +49,8 @@ describe('AnnotationShareInfo', () => {
   });
 
   describe('group link', () => {
-    it('should show a link to the group for extant, first-party groups', () => {
-      const wrapper = createAnnotationShareInfo();
+    it('should show a link to the group for extant, first-party groups when no groupnameUrl setting defined', () => {
+      const wrapper = createAnnotationShareInfo({ settings: {} });
 
       const groupLink = wrapper.find('a');
 
