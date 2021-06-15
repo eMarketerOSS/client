@@ -1,9 +1,9 @@
 import { IconButton, LinkButton } from '@hypothesis/frontend-shared';
 
 import bridgeEvents from '../../shared/bridge-events';
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
-import isThirdPartyService from '../helpers/is-third-party-service';
+import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
@@ -28,7 +28,7 @@ import UserMenu from './UserMenu';
  * @prop {() => any} onLogout - Callback invoked when user clicks "Logout" action in account menu.
  * @prop {() => any} onSignUp - Callback invoked when user clicks "Sign up" button.
  * @prop {MergedConfig} settings
- * @prop {import('../services/streamer').default} streamer
+ * @prop {import('../services/streamer').StreamerService} streamer
  */
 
 /**

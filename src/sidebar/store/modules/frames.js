@@ -6,7 +6,7 @@ import {
 import shallowEqual from 'shallowequal';
 
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
@@ -20,12 +20,10 @@ import { storeModule } from '../create-store';
  * @prop {string} uri - Current primary URI of the document being displayed
  */
 
-function init() {
-  // The list of frames connected to the sidebar app
-  return [];
-}
+/** @type {Frame[]} */
+const initialState = [];
 
-const update = {
+const reducers = {
   CONNECT_FRAME: function (state, action) {
     return [...state, action.frame];
   },
@@ -49,7 +47,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /**
  * Add a frame to the list of frames currently connected to the sidebar app.
@@ -155,12 +153,11 @@ const searchUris = createShallowEqualSelector(
   uris => uris
 );
 
-export default storeModule({
-  init: init,
+export default createStoreModule(initialState, {
   namespace: 'frames',
-  update: update,
+  reducers,
 
-  actions: {
+  actionCreators: {
     connectFrame,
     destroyFrame,
     updateFrameAnnotationFetchStatus,

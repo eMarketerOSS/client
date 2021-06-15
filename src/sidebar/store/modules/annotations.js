@@ -17,7 +17,7 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 import route from './route';
 
@@ -89,23 +89,32 @@ function initializeAnnotation(annotation, tag) {
   });
 }
 
-function init() {
-  return {
-    /** @type {Annotation[]} */
-    annotations: [],
-    // A set of annotations that are currently "focused" — e.g. hovered over in
-    // the UI
-    focused: {},
-    // A map of annotations that should appear as "highlighted", e.g. the
-    // target of a single-annotation view
-    highlighted: {},
-    // The local tag to assign to the next annotation that is loaded into the
-    // app
-    nextTag: 1,
-  };
-}
+const initialState = {
+  /**
+   * Set of all currently loaded annotations.
+   *
+   * @type {Annotation[]}
+   */
+  annotations: [],
+  /**
+   * A set of annotations that are currently "focused" — e.g. hovered over in
+   * the UI.
+   *
+   * @type {Record<string, boolean>}
+   */
+  focused: {},
+  /**
+   * A map of annotations that should appear as "highlighted", e.g. the
+   * target of a single-annotation view
+   *
+   * @type {Record<string, boolean>}
+   */
+  highlighted: {},
+  /** The local tag to assign to the next annotation that is loaded into the app. */
+  nextTag: 1,
+};
 
-const update = {
+const reducers = {
   ADD_ANNOTATIONS: function (state, action) {
     const updatedIDs = {};
     const updatedTags = {};
@@ -232,7 +241,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /* Action creators */
 
@@ -554,11 +563,10 @@ function savedAnnotations(state) {
   });
 }
 
-export default storeModule({
-  init: init,
+export default createStoreModule(initialState, {
   namespace: 'annotations',
-  update: update,
-  actions: {
+  reducers,
+  actionCreators: {
     addAnnotations,
     clearAnnotations,
     focusAnnotations,

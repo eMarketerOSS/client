@@ -87,7 +87,7 @@
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
  *
- * @typedef Integration
+ * @typedef IntegrationBase
  * @prop {(root: HTMLElement, selectors: Selector[]) => Promise<Range>} anchor -
  *   Attempt to resolve a set of serialized selectors to the corresponding content in the
  *   current document.
@@ -110,6 +110,8 @@
  * @prop {(a: Anchor) => Promise<void>} scrollToAnchor - Scroll to an anchor.
  *   This will only be called if the anchor has at least one highlight (ie.
  *   `anchor.highlights` is a non-empty array)
+ *
+ * @typedef {Destroyable & IntegrationBase} Integration
  */
 
 /**
@@ -138,7 +140,7 @@
  * when loaded in a frame that influence how it behaves.
  *
  * @typedef Globals
- * @prop {Object} [PDFViewerApplication] -
+ * @prop {import('./pdfjs').PDFViewerApplication} [PDFViewerApplication] -
  *   PDF.js entry point. If set, triggers loading of PDF rather than HTML integration.
  * @prop {boolean} [__hypothesis_frame] -
  *   Flag used to indicate that the "annotator" part of Hypothesis is loaded in
@@ -151,3 +153,11 @@
 
 // Make TypeScript treat this file as a module.
 export const unused = {};
+
+/**
+ * Destroyable classes implement the `destroy` method to properly remove all
+ * event handlers and other resources.
+ *
+ * @typedef Destroyable
+ * @prop {VoidFunction} destroy
+ */

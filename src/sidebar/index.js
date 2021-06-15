@@ -36,7 +36,11 @@ if (process.env.NODE_ENV !== 'production') {
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();
 
-// @inject
+/**
+ * @param {import('./services/api').APIService} api
+ * @param {import('./services/streamer').StreamerService} streamer
+ * @inject
+ */
 function setupApi(api, streamer) {
   api.setClientId(streamer.clientId);
 }
@@ -45,11 +49,11 @@ function setupApi(api, streamer) {
  * Perform the initial fetch of groups and user profile and then set the initial
  * route to match the current URL.
  *
- * @param {Object} groups
+ * @param {import('./services/groups').GroupsService} groups
  * @param {import('./services/session').SessionService} session
  * @param {import('./services/router').RouterService} router
+ * @inject
  */
-// @inject
 function setupRoute(groups, session, router) {
   groups.load();
   session.load();
@@ -83,8 +87,8 @@ function initServices(
 /**
  * @param {import('./services/frame-sync').FrameSyncService} frameSync
  * @param {import('./store').SidebarStore} store
+ * @inject
  */
-// @inject
 function setupFrameSync(frameSync, store) {
   if (store.route() === 'sidebar') {
     frameSync.connect();
@@ -113,7 +117,7 @@ import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
 import { FrameSyncService } from './services/frame-sync';
-import groupsService from './services/groups';
+import { GroupsService } from './services/groups';
 import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { LocalTagsService } from './services/local-tags';
@@ -123,13 +127,13 @@ import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
 import { SessionService } from './services/session';
 import { StreamFilter } from './services/stream-filter';
-import streamerService from './services/streamer';
+import { StreamerService } from './services/streamer';
 import { TagsService } from './services/tags';
 import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
 
 // Redux store.
-import store from './store';
+import { createSidebarStore } from './store';
 
 // Utilities.
 import { Injector } from '../shared/injector';
@@ -153,21 +157,21 @@ function startApp(config, appEl) {
     .register('bridge', bridgeService)
     .register('features', FeaturesService)
     .register('frameSync', FrameSyncService)
-    .register('groups', groupsService)
+    .register('groups', GroupsService)
     .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)
     .register('serviceURL', ServiceURLService)
     .register('session', SessionService)
-    .register('streamer', streamerService)
+    .register('streamer', StreamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
     .register('tagProvider', RemoteTagProviderService)
     .register('tagStore', LocalTagsService)
     .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
-    .register('store', store);
+    .register('store', { factory: createSidebarStore });
 
   // Register utility values/classes.
   //
