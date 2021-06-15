@@ -31,6 +31,7 @@ function configurationKeys(appContext) {
       'externalContainerSelector',
       'focus',
       'group',
+      'groupnameUrl', // Added by II
       'onLayoutChange',
       'openSidebar',
       'query',
@@ -38,6 +39,8 @@ function configurationKeys(appContext) {
       'services',
       'showHighlights',
       'sidebarAppUrl',
+      'tagnameUrl', // Added by II
+      'tagProviderUrl', // Added by II
       'theme',
       'usernameUrl',
     ],
@@ -105,6 +108,12 @@ const configDefinitions = {
   usernameUrl: {
     getValue: settings => settings.hostPageSetting('usernameUrl'),
   },
+  groupnameUrl: {
+    getValue: settings => settings.hostPageSetting('groupnameUrl'),
+  },
+  tagnameUrl: {
+    getValue: settings => settings.hostPageSetting('tagProviderUrl'),
+  },
   onLayoutChange: {
     getValue: settings => settings.hostPageSetting('onLayoutChange'),
   },
@@ -144,6 +153,9 @@ const configDefinitions = {
   externalContainerSelector: {
     getValue: settings => settings.hostPageSetting('externalContainerSelector'),
   },
+  tagProviderUrl: {
+    getValue: settings => settings.hostPageSetting('tagProviderUrl'),
+  }
 };
 
 /**
