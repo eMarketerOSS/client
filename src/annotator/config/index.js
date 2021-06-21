@@ -155,7 +155,7 @@ const configDefinitions = {
   },
   tagProviderUrl: {
     getValue: settings => settings.hostPageSetting('tagProviderUrl'),
-  }
+  },
 };
 
 /**

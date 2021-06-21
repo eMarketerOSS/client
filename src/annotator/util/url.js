@@ -7,12 +7,14 @@
  * @param {string} [base] - Base URL to resolve relative to. Defaults to
  *   the document's base URL.
  */
-export function normalizeURI(uri, base = document.baseURI) {
-  const absUrl = new URL(uri, base).href;
+import {
+  normalizeSharepointURI,
+  normalizeURIWithFragment,
+} from './normalizers/uri';
 
-  // Remove the fragment identifier.
-  // This is done on the serialized URL rather than modifying `url.hash` due to
-  // a bug in Safari.
-  // See https://github.com/hypothesis/h/issues/3471#issuecomment-226713750
-  return absUrl.toString().replace(/#.*/, '');
+export function normalizeURI(uri, base = document.baseURI) {
+  const fragmentStripped = normalizeURIWithFragment(uri, base);
+  const sharepointNormalized = normalizeSharepointURI(fragmentStripped, base);
+
+  return sharepointNormalized;
 }

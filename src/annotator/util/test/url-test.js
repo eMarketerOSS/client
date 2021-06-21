@@ -28,5 +28,28 @@ describe('annotator.util.url', () => {
         assert.equal(normalizeURI(url), url);
       });
     });
+
+    it('removes superfluous query parameters from sharepoint documents', () => {
+      const url =
+        'https://anyold.sharepoint.com/sites/foo/bar.aspx?p=true&originalPath=/foo/bar/baz&e=123456&id=%2Fsites%2Ffoo%2FBar_Baz-Biz.pdf&parent=%2Fsites%2Ffoo';
+      assert.equal(
+        normalizeURI(url),
+        'https://anyold.sharepoint.com/sites/foo/bar.aspx?id=%2Fsites%2Ffoo%2FBar_Baz-Biz.pdf&parent=%2Fsites%2Ffoo'
+      );
+    });
+
+    it('alphabetically orders canonical query parameters from sharepoint documents', () => {
+      const url =
+        'https://anyold.sharepoint.com/sites/foo/bar.aspx?parent=%2Fsites%2Ffoo&id=%2Fsites%2Ffoo%2FBar_Baz-Biz.pdf';
+      assert.equal(
+        normalizeURI(url),
+        'https://anyold.sharepoint.com/sites/foo/bar.aspx?id=%2Fsites%2Ffoo%2FBar_Baz-Biz.pdf&parent=%2Fsites%2Ffoo'
+      );
+    });
+
+    it('does not modify non-sharepoint URIs', () => {
+      const url = 'http://example.com/wibble?p=true';
+      assert.equal(normalizeURI(url), url);
+    });
   });
 });
