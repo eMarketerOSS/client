@@ -1,3 +1,5 @@
+const normalizeUrl = require('normalize-url');
+
 /**
  * Return a normalized version of a URI.
  *
@@ -30,23 +32,32 @@ export function normalizeURIWithFragment(uri, base = document.baseURI) {
  * @param {string} [base] - Base URL to resolve relative to. Defaults to
  *   the document's base URL.
  */
-const normalizeUrl = require('normalize-url');
 
-export function normalizeSharepointURI(uri, base = document.baseURI) {
-  let absUrl = new URL(uri, base);
+// The following sites need custom normalization
+const CUSTOM_URI_NORMALIZERS = [
+  {
+    match: uri => uri.includes('.sharepoint.com'),
+    normalize: uri =>
+      normalizeUrl(uri, {
+        sortQueryParameters: true,
+        removeQueryParameters: ['e', 'p', 'q', 'originalPath', 'parentview'],
+        stripAuthentication: true,
+        stripHash: true,
+        forceHttps: true,
+        stripWWW: true,
+        removeTrailingSlash: true,
+        removeSingleSlash: true,
+      }),
+  },
+];
 
-  if (absUrl.host.includes('.sharepoint.com')) {
-    return normalizeUrl(absUrl.toString(), {
-      sortQueryParameters: true,
-      removeQueryParameters: ['e', 'p', 'q', 'originalPath', 'parentview'],
-      stripAuthentication: true,
-      stripHash: true,
-      forceHttps: true,
-      stripWWW: true,
-      removeTrailingSlash: true,
-      removeSingleSlash: true,
-    });
+export function normalizeCustomURI(uri) {
+  const customNormalizer = CUSTOM_URI_NORMALIZERS.find(normalizer =>
+    normalizer.match(uri)
+  );
+  if (customNormalizer) {
+    return customNormalizer.normalize(uri);
   }
 
-  return absUrl.toString();
+  return uri;
 }

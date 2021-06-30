@@ -8,13 +8,13 @@
  *   the document's base URL.
  */
 import {
-  normalizeSharepointURI,
+  normalizeCustomURI,
   normalizeURIWithFragment,
 } from './normalizers/uri';
 
 export function normalizeURI(uri, base = document.baseURI) {
   const fragmentStripped = normalizeURIWithFragment(uri, base);
-  const sharepointNormalized = normalizeSharepointURI(fragmentStripped, base);
+  const normalized = normalizeCustomURI(fragmentStripped);
 
-  return sharepointNormalized;
+  return normalized;
 }
