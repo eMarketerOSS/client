@@ -7,6 +7,7 @@ import shallowEqual from 'shallowequal';
 
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
+import { normalizeCustomURI } from '../../../annotator/util/normalizers/uri';
 
 /**
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
@@ -112,7 +113,9 @@ const mainFrame = createSelector(
  * @param {Frame} frame
  */
 function searchUrisForFrame(frame) {
-  let uris = [frame.uri];
+  const frameUri = normalizeCustomURI(frame.uri);
+
+  let uris = [frameUri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
     uris = frame.metadata.link.map(function (link) {
